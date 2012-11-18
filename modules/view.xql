@@ -13,6 +13,9 @@ import module namespace templates="http://exist-db.org/xquery/templates" at "tem
  :)
 import module namespace config="http://exist-db.org/xquery/apps/config" at "config.xqm";
 import module namespace app="http://exist-db.org/xquery/app" at "app.xql";
+import module namespace ecmAccount="http://edirom.de/ecm/xquery/account" at "ecmAccount.xqm";
+import module namespace ecmCore="http://edirom.de/ecm/xquery/account" at "ecmCore.xqm";
+import module namespace intl = "http://exist-db.org/xquery/i18n/templates" at "i18n-templates.xql";
 
 declare option exist:serialize "method=html5 media-type=text/html";
 
