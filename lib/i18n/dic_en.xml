@@ -3,6 +3,10 @@
     <msg key="Cancel">Cancel</msg>
     <msg key="RememberMe">Remember me</msg>
     <!-- app:get-account-data() -->
+    <msg key="ChangePassword">Change Password</msg>
+    <msg key="OldPassword">Current Password</msg>
+    <msg key="NewPassword">New Password</msg>
+    <msg key="ConfirmNewPassword">Confirm New Password</msg>
     <msg key="LoginDetails">Login Details</msg>
     <msg key="LoginName">Login Name</msg>
     <msg key="ChooseLoginName">Choose Login Name</msg>

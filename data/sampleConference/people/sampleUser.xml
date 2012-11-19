@@ -1,0 +1,20 @@
+<person xmlns="http://www.tei-c.org/ns/1.0">
+    <idno type="ecm">edirom</idno>
+    <persName>
+        <surname>Mustermann</surname>
+        <forename>Max</forename>
+    </persName>
+    <persName type="billingFull">Max Mustermann</persName>
+    <sex>m</sex>
+    <affiliation>
+        <orgName>Institut XY</orgName>
+        <address>
+            <addrLine>Lange Str. 17</addrLine>
+            <addrLine>Adresszusatz</addrLine>
+            <postCode>12345</postCode>
+            <settlement>Entenhausen</settlement>
+            <country>Fantasia</country>
+        </address>
+        <email>max@aol.com</email>
+    </affiliation>
+</person>
