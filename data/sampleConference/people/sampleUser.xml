@@ -1,11 +1,10 @@
 <person xmlns="http://www.tei-c.org/ns/1.0">
-    <idno type="ecm">edirom</idno>
+    <idno type="ecm">sampleUser</idno>
     <persName>
         <surname>Mustermann</surname>
         <forename>Max</forename>
     </persName>
-    <persName type="billingFull">Max Mustermann</persName>
-    <sex>m</sex>
+    <sex/>
     <affiliation>
         <orgName>Institut XY</orgName>
         <address>

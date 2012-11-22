@@ -9,6 +9,7 @@ import module namespace login="http://exist-db.org/xquery/app/wiki/session" at "
 import module namespace ecmAccount="http://edirom.de/ecm/xquery/account" at "ecmAccount.xqm";
 import module namespace ecmCore="http://edirom.de/ecm/xquery/core" at "ecmCore.xqm";
 import module namespace i18n="http://exist-db.org/xquery/i18n" at "i18n.xql";
+import module namespace config="http://exist-db.org/xquery/apps/config" at "config.xqm";
 
 declare function app:get-right-sidebar($node as node(), $model as map(*)) {
     if(exists(ecmCore:current-fe-user())) then app:get-user-shortcuts()
@@ -41,6 +42,7 @@ declare function app:get-login() as element(form) {
  :)
 declare function app:get-intro($node as node(), $model as map(*)) {
     <p class="lead">Willkommen beim Edirom Conference Mangager.</p>,
+    <p>App root: {$config:app-root}</p>,
     i18n:process(<p class="intl:translate"><i18n:text key="RememberMe">Translate simple text</i18n:text></p>)
 };
 
@@ -56,137 +58,174 @@ declare function app:get-user-shortcuts() as element(div) {
 };
 
 declare function app:get-account-data($node as node(), $model as map(*)) {
+    let $setHeader := response:set-header('cache-control','no-cache')
+    let $saveUserData := if(request:get-parameter-names() = 'save') then ecmAccount:set-user-data((ecmAccount:createTEIPersonFromHttpRequest(ecmCore:current-fe-user())), ecmCore:get-conference-name()) else ()
     let $userData := ecmAccount:get-data(ecmCore:current-fe-user(), ecmCore:get-conference-name())
+    
     let $passwordFieldset := 
         <fieldset>
-            <legend><i18n:text key="ChangePassword">Change Password</i18n:text></legend>
-            <label class="inputLabel" for="password-old"><i18n:text key="OldPassword">Old Password</i18n:text>:</label>
-            <input type="password" name="password" size="21" maxlength="40" id="password-old" placeholder="******"/>
+            <legend><i18n:text key="changePassword">Change Password</i18n:text></legend>
+            <label class="inputLabel" for="oldPassword"><i18n:text key="oldPassword">Old Password</i18n:text>:</label>
+            <input type="password" name="password" size="21" maxlength="40" id="oldPassword" placeholder="******"/>
             <span class="alert">*</span>
             <br class="clearBoth"/>
-            <label class="inputLabel" for="password-new"><i18n:text key="NewPassword">New Password</i18n:text>:</label>
-            <input type="password" name="password" size="21" maxlength="40" id="password-new" placeholder="******"/>
+            <label class="inputLabel" for="newPassword"><i18n:text key="newPassword">New Password</i18n:text>:</label>
+            <input type="password" name="password" size="21" maxlength="40" id="newPassword" placeholder="******"/>
             <span class="alert">* (<i18n:translate><i18n:text key="atLeastXCharacters">at least {{1}} characters</i18n:text><i18n:param>6</i18n:param></i18n:translate>)</span>
             <br class="clearBoth"/>
-            <label class="inputLabel" for="password-confirm"><i18n:text key="ConfirmNewPassword">Confirm New Password</i18n:text>:</label>
-            <input type="password" name="confirmation" size="21" maxlength="40" id="password-confirm" placeholder="******"/>
+            <label class="inputLabel" for="confirmNewPassword"><i18n:text key="confirmNewPassword">Confirm New Password</i18n:text>:</label>
+            <input type="password" name="confirmNewPassword" size="21" maxlength="40" id="confirmNewPassword" placeholder="******"/>
             <span class="alert">*</span>
             <br class="clearBoth"/>
         </fieldset>
     let $newUserFieldset := 
         <fieldset>
-            <legend><i18n:text key="LoginDetails">Login Details</i18n:text></legend>
-            <label class="inputLabel" for="loginName"><i18n:text key="LoginName">Login Name</i18n:text>:</label>
-            <input type="text" name="loginName" size="41" maxlength="96" id="loginName" placeholder="i18n(ChooseLoginName)"/>
+            <legend><i18n:text key="loginDetails">Login Details</i18n:text></legend>
+            <label class="inputLabel" for="loginName"><i18n:text key="loginName">Login Name</i18n:text>:</label>
+            <input type="text" name="loginName" size="41" maxlength="96" id="loginName" placeholder="i18n(chooseLoginName)"/>
             <span class="alert">*</span>
             <br class="clearBoth"/>
-            <label class="inputLabel" for="email"><i18n:text key="EmailAddress">Email Address</i18n:text>:</label>
-            <input type="text" name="email" size="41" maxlength="96" id="email" placeholder="i18n(EmailAddress)"/>
-            <span class="alert">*</span>
-            <br class="clearBoth"/>
-            <label class="inputLabel" for="password-new"><i18n:text key="Password">Password</i18n:text>:</label>
-            <input type="password" name="password" size="21" maxlength="40" id="password-new" placeholder="******"/>
+            <label class="inputLabel" for="password"><i18n:text key="Password">Password</i18n:text>:</label>
+            <input type="password" name="password" size="21" maxlength="40" id="password" placeholder="******"/>
             <span class="alert">* (<i18n:translate><i18n:text key="atLeastXCharacters">at least {{1}} characters</i18n:text><i18n:param>6</i18n:param></i18n:translate>)</span>
             <br class="clearBoth"/>
-            <label class="inputLabel" for="password-confirm"><i18n:text key="ConfirmPassword">Confirm Password</i18n:text>:</label>
-            <input type="password" name="confirmation" size="21" maxlength="40" id="password-confirm" placeholder="******"/>
+            <label class="inputLabel" for="confirmPassword"><i18n:text key="confirmPassword">Confirm Password</i18n:text>:</label>
+            <input type="password" name="confirmPassword" size="21" maxlength="40" id="confirmPassword" placeholder="******"/>
             <span class="alert">*</span>
             <br class="clearBoth"/>
         </fieldset>
+    let $emailFieldset := 
+        <fieldset>
+            <legend><i18n:text key="email">Email</i18n:text></legend>
+            <label class="inputLabel" for="email"><i18n:text key="email">Email Address</i18n:text>:</label>
+            {element input {
+                attribute type {'text'},
+                attribute name {'email'},
+                attribute size {'41'},
+                attribute maxlength {'96'},
+                attribute id {'email'},
+                if(exists($userData)) then attribute value {$userData//tei:email} else attribute placeholder {'i18n(email)'}
+                }
+            }
+            <span class="alert">*</span>
+            <br class="clearBoth"/>
+            <label class="inputLabel" for="confirmEmail"><i18n:text key="confirmEmail">Confirm Email Address</i18n:text>:</label>
+            {element input {
+                attribute type {'text'},
+                attribute name {'confirmEmail'},
+                attribute size {'41'},
+                attribute maxlength {'96'},
+                attribute id {'confirmEmail'},
+                if(exists($userData)) then attribute value {$userData//tei:email} else attribute placeholder {'i18n(confirmEmail)'}
+                }
+            }
+            <span class="alert">*</span>
+        </fieldset>
     let $standardFieldset :=
         <fieldset>
-            <legend><i18n:text key="BillingAddress">Billing Address</i18n:text></legend>
-            <label class="inputLabel" for="firstName"><i18n:text key="FirstName">First Name</i18n:text>:</label>
+            <legend><i18n:text key="billingAddress">Billing Address</i18n:text></legend>
+            <label class="inputLabel" for="forename"><i18n:text key="forename">First Name</i18n:text>:</label>
             {element input {
                 attribute type {'text'},
-                attribute name {'firstName'},
+                attribute name {'forename'},
                 attribute size {'33'},
                 attribute maxlength {'32'},
-                attribute id {'firstName'},
-                if(exists($userData)) then attribute value {$userData//tei:forename} else attribute placeholder {'i18n(FirstName)'}
+                attribute id {'forename'},
+                if(exists($userData)) then attribute value {$userData//tei:forename} else attribute placeholder {'i18n(forename)'}
                 }
             }
             <span class="alert">*</span>
             <br class="clearBoth"/>
-            <label class="inputLabel" for="lastName"><i18n:text key="LastName">Last Name</i18n:text>:</label>
+            <label class="inputLabel" for="surname"><i18n:text key="surname">Last Name</i18n:text>:</label>
             {element input {
                 attribute type {'text'},
-                attribute name {'lastName'},
+                attribute name {'surname'},
                 attribute size {'33'},
                 attribute maxlength {'32'},
-                attribute id {'lastName'},
-                if(exists($userData)) then attribute value {$userData//tei:surname} else attribute placeholder {'i18n(LastName)'}
+                attribute id {'surname'},
+                if(exists($userData)) then attribute value {$userData//tei:surname} else attribute placeholder {'i18n(surname)'}
                 }
             }
             <span class="alert">*</span>
             <br class="clearBoth"/>
-            <label class="inputLabel" for="institution"><i18n:text key="Institution">Institution</i18n:text>:</label>
+            <label class="inputLabel" for="orgName"><i18n:text key="orgName">Institution</i18n:text>:</label>
             {element input {
                 attribute type {'text'},
-                attribute name {'institution'},
+                attribute name {'orgName'},
                 attribute size {'41'},
                 attribute maxlength {'64'},
-                attribute id {'institution'},
-                if(exists($userData)) then attribute value {$userData//tei:orgName} else attribute placeholder {'i18n(Institution)'}
+                attribute id {'orgName'},
+                if(exists($userData)) then attribute value {$userData//tei:orgName} else attribute placeholder {'i18n(orgName)'}
                 }
             }
             <br class="clearBoth"/>
-            <label class="inputLabel" for="addressLine1"><i18n:text key="AddressLine1">Street Address</i18n:text>:</label>
+            <label class="inputLabel" for="addrLine1"><i18n:text key="addrLine1">Street Address</i18n:text>:</label>
             {element input {
                 attribute type {'text'},
-                attribute name {'addressLine1'},
+                attribute name {'addrLine1'},
                 attribute size {'41'},
                 attribute maxlength {'64'},
-                attribute id {'addressLine1'},
-                if(exists($userData)) then attribute value {$userData//tei:addrLine[1]} else attribute placeholder {'i18n(AddressLine1)'}
+                attribute id {'addrLine1'},
+                if(exists($userData)) then attribute value {$userData//tei:addrLine[1]} else attribute placeholder {'i18n(addrLine1)'}
                 }
             }
             <span class="alert">*</span>
             <br class="clearBoth"/>
-            <label class="inputLabel" for="addressLine2"><i18n:text key="AddressLine2">Address Line 2</i18n:text>:</label>
+            <label class="inputLabel" for="addrLine2"><i18n:text key="addrLine2">Address Line 2</i18n:text>:</label>
             {element input {
                 attribute type {'text'},
-                attribute name {'addressLine2'},
+                attribute name {'addrLine2'},
                 attribute size {'41'},
                 attribute maxlength {'64'},
-                attribute id {'addressLine2'},
-                if(exists($userData)) then attribute value {$userData//tei:addrLine[2]} else attribute placeholder {'i18n(AddressLine2)'}
+                attribute id {'addrLine2'},
+                if(exists($userData)) then attribute value {$userData//tei:addrLine[2]} else attribute placeholder {'i18n(addrLine2)'}
                 }
             }
             <br class="clearBoth"/>
-            <label class="inputLabel" for="city"><i18n:text key="City">City</i18n:text>:</label>
+            <label class="inputLabel" for="settlement"><i18n:text key="settlement">City</i18n:text>:</label>
             {element input {
                 attribute type {'text'},
-                attribute name {'city'},
+                attribute name {'settlement'},
                 attribute size {'33'},
                 attribute maxlength {'32'},
-                attribute id {'city'},
-                if(exists($userData)) then attribute value {$userData//tei:settlement} else attribute placeholder {'i18n(City)'}
+                attribute id {'settlement'},
+                if(exists($userData)) then attribute value {$userData//tei:settlement} else attribute placeholder {'i18n(settlement)'}
                 }
             }
             <span class="alert">*</span>
             <br class="clearBoth"/>
-            <label class="inputLabel" for="postcode"><i18n:text key="PostCode">Post/Zip Code</i18n:text>:</label>
+            <label class="inputLabel" for="postCode"><i18n:text key="postCode">Post/Zip Code</i18n:text>:</label>
             {element input {
                 attribute type {'text'},
-                attribute name {'postcode'},
+                attribute name {'postCode'},
                 attribute size {'11'},
                 attribute maxlength {'10'},
-                attribute id {'postcode'},
-                if(exists($userData)) then attribute value {$userData//tei:postCode} else attribute placeholder {'i18n(PostCode)'}
+                attribute id {'postCode'},
+                if(exists($userData)) then attribute value {$userData//tei:postCode} else attribute placeholder {'i18n(postCode)'}
                 }
             }
             <span class="alert">*</span>
             <br class="clearBoth"/>
+            <label class="inputLabel" for="country"><i18n:text key="country">Country</i18n:text>:</label>
+            {element input {
+                attribute type {'text'},
+                attribute name {'country'},
+                attribute size {'33'},
+                attribute maxlength {'32'},
+                attribute id {'country'},
+                if(exists($userData)) then attribute value {$userData//tei:country} else attribute placeholder {'i18n(country)'}
+                }
+            }
+            <span class="alert">*</span>
         </fieldset>
     
     return  
         i18n:process(
-            <form name="manageAccount" method="post" action="account.html" class="intl:translate">{
+            <form name="manageAccount" method="post" action="account.html?save" class="intl:translate">{
                 if(exists($userData)) then ()  
                 else $newUserFieldset,
                 if(request:get-parameter-names() = 'changePassword') then $passwordFieldset
-                else $standardFieldset
+                else ($emailFieldset, $standardFieldset)
                 }
                 <button class="btn btn-primary" type="submit"><i18n:text key="Save">Save</i18n:text></button>
             </form>
@@ -205,7 +244,7 @@ declare function app:get-top-nav($node as node(), $model as map(*)) as element(u
             },
             element li {
                 element a {
-                    attribute href {if($loggedIn) then 'account.html' else 'registration.html'},
+                    attribute href {if($loggedIn) then 'account.html' else 'account.html'},
                     if($loggedIn) then 'My Account' else 'Registration'
                 }
             }

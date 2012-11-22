@@ -15,7 +15,7 @@ else if ($exist:resource eq "login") then
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
         <forward url="{$exist:controller}/modules/login.xql"/>
     </dispatch>
-else if (ends-with($exist:resource, ".html")) then
+else if (ends-with($exist:resource, ".html")) then (
     (: the html page is run through view.xql to expand templates :)
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
         <view>
@@ -26,6 +26,7 @@ else if (ends-with($exist:resource, ".html")) then
 			<forward url="{$exist:controller}/modules/view.xql"/>
 		</error-handler>
     </dispatch>
+    )
 (: Requests for javascript libraries are resolved to the file system :)
 else if (contains($exist:path, "/libs/")) then
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">

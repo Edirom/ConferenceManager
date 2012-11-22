@@ -4,17 +4,19 @@ module namespace ecmCore="http://edirom.de/ecm/xquery/core";
 
 declare namespace tei="http://www.tei-c.org/ns/1.0";
 
+import module namespace config="http://exist-db.org/xquery/apps/config" at "config.xqm";
+
 declare function ecmCore:get-conference-name() as xs:string {
-    'mei2013'
+    'sampleConference'
 };
 
 declare function ecmCore:get-data-dir() as xs:string {
-    '/db/apps/EdiromConferenceManager-dev/data'
+    $config:app-root || '/data'
 };
 
 declare function ecmCore:current-fe-user() as xs:string? {
-    (:'edirom':)
-    ()
+    'sampleUser'
+    (:():)
 };
 
 declare function ecmCore:get-user-dir($conference as xs:string) as xs:string? {
@@ -38,5 +40,5 @@ declare function ecmCore:get-default-i18n-language() as xs:string {
 };
 
 declare function ecmCore:get-default-i18n-catalogue-dir() as xs:string {
-    '/db/apps/EdiromConferenceManager-dev/lib/i18n'
+    $config:app-root || '/lib/i18n'
 };

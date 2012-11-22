@@ -1,66 +1,52 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<grammar ns="http://www.tei-c.org/ns/1.0" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
-  <start>
-    <element name="person">
-      <element name="idno">
-        <attribute name="type">
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" ns="http://www.tei-c.org/ns/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+    <start>
+        <element name="person">
+            <element name="idno">
+                <attribute name="type">
           <!--<data type="NCName"/>-->
-          <value>ecm</value>
-        </attribute>
-        <data type="NCName"/>
-      </element>
-      <oneOrMore>
-        <element name="persName">
-          <optional>
-            <attribute name="type">
-              <!--<data type="NCName"/>-->
-              <value>billingFull</value>
-            </attribute>
-          </optional>
-          <oneOrMore>
-            <choice>
-              <text/>
-              <element name="forename">
+                    <value>ecm</value>
+                </attribute>
                 <data type="NCName"/>
-              </element>
-              <element name="surname">
-                <data type="NCName"/>
-              </element>
-            </choice>
-          </oneOrMore>
-        </element>
-      </oneOrMore>
-      <element name="sex">
-        <choice>
-          <value>m</value>
-          <value>f</value>
-          <value>o</value>
-        </choice>
-      </element>
-      <element name="affiliation">
-        <element name="orgName">
-          <text/>
-        </element>
-        <element name="address">
-          <oneOrMore>
-            <element name="addrLine">
-              <text/>
             </element>
-          </oneOrMore>
-          <element name="postCode">
-            <data type="integer"/>
-          </element>
-          <element name="settlement">
-            <data type="NCName"/>
-          </element>
-          <element name="country">
-            <data type="NCName"/>
-          </element>
+            <element name="persName">
+                <element name="forename">
+                    <data type="NCName"/>
+                </element>
+                <element name="surname">
+                    <data type="NCName"/>
+                </element>
+            </element>
+            <element name="sex">
+                <choice>
+                    <value>m</value>
+                    <value>f</value>
+                    <value>o</value>
+                </choice>
+            </element>
+            <element name="affiliation">
+                <element name="orgName">
+                    <text/>
+                </element>
+                <element name="address">
+                    <oneOrMore>
+                        <element name="addrLine">
+                            <text/>
+                        </element>
+                    </oneOrMore>
+                    <element name="postCode">
+                        <data type="integer"/>
+                    </element>
+                    <element name="settlement">
+                        <data type="NCName"/>
+                    </element>
+                    <element name="country">
+                        <data type="NCName"/>
+                    </element>
+                </element>
+                <element name="email">
+                    <text/>
+                </element>
+            </element>
         </element>
-        <element name="email">
-          <text/>
-        </element>
-      </element>
-    </element>
-  </start>
+    </start>
 </grammar>
