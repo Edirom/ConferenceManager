@@ -59,8 +59,8 @@ declare function app:get-user-shortcuts() as element(div) {
 
 declare function app:get-account-data($node as node(), $model as map(*)) {
     let $setHeader := response:set-header('cache-control','no-cache')
-    let $saveUserData := if(request:get-parameter-names() = 'save') then ecmAccount:set-user-data((ecmAccount:createTEIPersonFromHttpRequest(ecmCore:current-fe-user())), ecmCore:get-conference-name()) else ()
-    let $userData := ecmAccount:get-data(ecmCore:current-fe-user(), ecmCore:get-conference-name())
+    let $saveUserData := if(request:get-parameter-names() = 'save') then ecmAccount:set-user-data((ecmAccount:createTEIPersonFromHttpRequest(ecmCore:current-fe-user())), ecmCore:get-conference-id()) else ()
+    let $userData := ecmAccount:get-data(ecmCore:current-fe-user(), ecmCore:get-conference-id())
     
     let $passwordFieldset := 
         <fieldset>
